@@ -9,7 +9,16 @@ public class Array
     // 请实现该函数，禁止修改其它函数代码或者其它类的代码
     public static int indexOf(int data, int[] array)
     {
-        return -1;
+        int pos = -1;
+        for (int i = 0; i < array.length; i++)
+        {
+            if(array[i] == data)
+            {
+                pos = i;
+                break;
+            }
+        }
+        return pos;
     }
 
     // 该程序运行结果应该是输出1和-1

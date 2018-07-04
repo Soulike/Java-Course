@@ -38,7 +38,14 @@ public class EightQueens
         {
             //代码开发
             // 请将else语句块中的代码给以实现
-
+            for (int i = 0; i < 8; i++)
+            {
+                if (check(n, i))
+                {
+                    a[n] = i;
+                    place(n + 1);
+                }
+            }
 
             //代码结束
         }

@@ -29,7 +29,13 @@ public class InsertionSort
 
             int key = a[i];
 
-            for (int j = i - 1; j > p; j--)
+/*            for (int j = i - 1; j > p; j--)
+            {
+
+                a[j + 1] = a[j];
+            }*/
+            //插入到p位置，那么p位置的元素同样需要移动，因此j需要到p
+            for (int j = i - 1; j >= p; j--)
             {
 
                 a[j + 1] = a[j];

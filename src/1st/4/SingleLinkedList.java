@@ -266,7 +266,28 @@ public class SingleLinkedList
     public int indexOf(int data)
     {    // 返回数据在单链表中第一次的出现位置的下标
         // 如果数据在单链表中不存在，则返回-1
-        return -1;
+        if (size == 0)
+        {
+            return -1;
+        }
+        else
+        {
+            int pos = -1;
+            Node node = head;
+            for (int i = 0; i < size; i++)
+            {
+                if (node.data == data)
+                {
+                    pos = i;
+                    break;
+                }
+                else
+                {
+                    node = node.next;
+                }
+            }
+            return pos;
+        }
     }
 
     public static void main(String[] args)

@@ -86,9 +86,21 @@ public class BinarySortTree
     // root指向二叉排序树的根节点
     public static boolean contains(BstNode root, int data)
     {
-
-
-        return false;
+        if (root == null)
+        {
+            return false;
+        }
+        else
+        {
+            if (root.data == data)
+            {
+                return true;
+            }
+            else
+            {
+                return contains(root.left, data) || contains(root.right, data);
+            }
+        }
 
     }
 

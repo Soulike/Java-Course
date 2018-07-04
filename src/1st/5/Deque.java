@@ -22,8 +22,7 @@ public class Deque
     //请实现removeLast函数
     public void removeLast()
     {
-
-
+        list.remove(size() - 1);
     }
 
     public void removeFirst()

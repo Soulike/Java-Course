@@ -15,16 +15,17 @@ public class Stack
     }
 
     //请实现pop函数，从栈顶返回数据(弹出数据)，要求必须是先进后出，FILO结构
-    public int pop()
+    public int pop() throws RuntimeException
     {
-        return -1;
+        int data = list.get(size() - 1);
+        list.remove(size() - 1);
+        return data;
     }
 
     //数据进栈操作
     public void push(int data)
     {
         list.add(data);
-
     }
 
     //栈数据复制
