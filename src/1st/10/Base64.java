@@ -1,18 +1,16 @@
-import java.nio.charset.Charset;
 import java.util.ArrayList;
-import java.io.*;
 
 public class Base64
 {
 
-    private final static String INDEX_TABLE = "ABCDEFGHIGKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+    private final static String INDEX_TABLE = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
     private final static int ENCODE_MASK = 0b11111100_00000000_00000000_00000000;
     private final static int DECODE_MASK = 0b11111111_00000000_00000000_00000000;
 
     public static String encode(byte[] binaryData)
     {
         final int BYTES_LEFT = binaryData.length % 3;//最后剩余几个字节
-        int suffixNum = 0;// 最后需要补几个=
+        int suffixNum = 0;// 最后需要补几个'='
         if (BYTES_LEFT == 1)
         {
             suffixNum = 2;
@@ -21,26 +19,26 @@ public class Base64
         {
             suffixNum = 1;
         }
-        final int GROUP_NUM = binaryData.length / 3;
+        int groupNum = BYTES_LEFT == 0 ? binaryData.length / 3 : binaryData.length / 3 + 1;
         StringBuilder encodedStr = new StringBuilder();
         int buffer = 0;
         int temp = 0;
 
 
-        for (int i = 0; i < GROUP_NUM + 1; i++)
+        for (int i = 0; i < groupNum; i++)
         {
             for (int j = 0; j < 3; j++)
             {
-                if (i == GROUP_NUM && j == BYTES_LEFT)
+
+                if (i * 3 + j >= binaryData.length)
                 {
-                    buffer <<= suffixNum * 8;
-                    break;
+                    buffer += 0;
                 }
                 else
                 {
                     buffer += binaryData[i * 3 + j];
-                    buffer <<= 8;
                 }
+                buffer <<= 8;
             }
             for (int j = 0; j < 4; j++)
             {
@@ -105,11 +103,13 @@ public class Base64
     public static void main(String[] args)
     {
         //byte[] a = {1, 2, 3, -7, -9, 110};
-        byte[] a = "oigheiowushgbviugbuirheagviuboerwalgivhealruv".getBytes();
+        byte[] a = "nvwielouhnviwue".getBytes();
+
         for (int i = 0; i < a.length; i++)
         {
             System.out.print(a[i] + " ");
         }
+
         String s = encode(a);
         System.out.println(s);
         byte[] b = decode(s);
@@ -118,7 +118,5 @@ public class Base64
             System.out.print(b[i] + " ");
         }
         System.out.println();
-
     }
-
 }
