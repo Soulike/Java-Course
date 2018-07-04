@@ -1,11 +1,13 @@
+import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.io.*;
 
 public class Base64
 {
 
     private final static String INDEX_TABLE = "ABCDEFGHIGKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
     private final static int ENCODE_MASK = 0b11111100_00000000_00000000_00000000;
-    private final static int DECODE_MASK = 0b11111100_00000000_00000000_00000000;
+    private final static int DECODE_MASK = 0b11111111_00000000_00000000_00000000;
 
     public static String encode(byte[] binaryData)
     {
@@ -29,26 +31,27 @@ public class Base64
         {
             for (int j = 0; j < 3; j++)
             {
-
                 if (i == GROUP_NUM && j == BYTES_LEFT)
                 {
-                    buffer += binaryData[(i - 1) * 3 + j];
-                    buffer <<= suffixNum;
+                    buffer <<= suffixNum * 8;
                     break;
                 }
                 else
                 {
                     buffer += binaryData[i * 3 + j];
+                    buffer <<= 8;
                 }
-                buffer <<= 8;
             }
-            buffer <<= 8;
             for (int j = 0; j < 4; j++)
             {
                 temp = buffer & ENCODE_MASK;
                 buffer <<= 6;
                 encodedStr.append(INDEX_TABLE.charAt(temp >>> 26));
             }
+        }
+        for (int i = 0; i < suffixNum; i++)
+        {
+            encodedStr.delete(encodedStr.length() - 1, encodedStr.length());
         }
         for (int i = 0; i < suffixNum; i++)
         {
@@ -69,11 +72,18 @@ public class Base64
             for (int j = 0; j < 4; j++)
             {
                 charBuffer = s.charAt(i * 4 + j);
-                decodeNum = INDEX_TABLE.indexOf(charBuffer);
+                if (charBuffer == '=')
+                {
+                    decodeNum = 0;
+                }
+                else
+                {
+                    decodeNum = INDEX_TABLE.indexOf(charBuffer);
+                }
                 buffer += decodeNum;
                 buffer <<= 6;
             }
-            buffer <<= 8;
+            buffer <<= 2;
             for (int j = 0; j < 3; j++)
             {
                 arrayList.add((byte) ((buffer & DECODE_MASK) >>> 24));
@@ -94,7 +104,12 @@ public class Base64
 
     public static void main(String[] args)
     {
-        byte[] a = {1, 2, 3, -7, -9, 110};
+        //byte[] a = {1, 2, 3, -7, -9, 110};
+        byte[] a = "oigheiowushgbviugbuirheagviuboerwalgivhealruv".getBytes();
+        for (int i = 0; i < a.length; i++)
+        {
+            System.out.print(a[i] + " ");
+        }
         String s = encode(a);
         System.out.println(s);
         byte[] b = decode(s);
