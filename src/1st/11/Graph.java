@@ -6,12 +6,6 @@ public class Graph
     private int[][] paths;// 结点之间的路径长度
     public static int INF = -1;//正无穷距离
 
-    public Graph()
-    {
-        nodeNames = null;
-        paths = null;
-    }
-
     public Graph(String[] nodeNames, int[][] paths)
     {
         this.nodeNames = nodeNames.clone();

@@ -3,12 +3,6 @@ public class Pair<F, S>
     private final F first;
     private final S second;
 
-    public Pair()
-    {
-        first = null;
-        second = null;
-    }
-
     public Pair(F first, S second)
     {
         this.first = first;
