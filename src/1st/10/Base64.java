@@ -71,10 +71,14 @@ public class Base64
     public static byte[] decode(String s)
     {
         ArrayList<Byte> arrayList = new ArrayList<>();
+        // 每个字符事实上代表6位。看有多少组24位
         final int GROUP_SIZE = s.length() / 4;
+        // 放置每个字符
         char charBuffer;
+        // 字符代表的数字
         int decodeNum = 0;
-        int buffer = 0;
+        int buffer24Bits = 0;
+        // 成24位的取出并解码
         for (int i = 0; i < GROUP_SIZE; i++)
         {
             for (int j = 0; j < 4; j++)
@@ -88,20 +92,22 @@ public class Base64
                 {
                     decodeNum = INDEX_TABLE.indexOf(charBuffer);
                 }
-                buffer += decodeNum;
-                buffer <<= 6;
+                buffer24Bits += decodeNum;
+                buffer24Bits <<= 6;
             }
-            buffer <<= 2;
-            for (int j = 0; j < 3; j++)
+            // 需要把24位移动到int的高位，因此需要补移2位
+            buffer24Bits <<= 2;
+
+            // 每个字节取出查看数据。如果出现了8位全是0，那么必然是补上去的，忽略
+            for (int j = 0; j < 3 && buffer24Bits != 0; j++)
             {
-                arrayList.add((byte) ((buffer & DECODE_MASK) >>> 24));
-                buffer <<= 8;
-                if (buffer == 0)
-                {
-                    break;
-                }
+                // 取出高8位数据，移动到低位，并截断成byte。
+                arrayList.add((byte) ((buffer24Bits & DECODE_MASK) >>> 24));
+                buffer24Bits <<= 8;
+
             }
         }
+        // 把arrayList中的数据移动到byte数组中
         byte[] arr = new byte[arrayList.size()];
         for (int i = 0; i < arrayList.size(); i++)
         {
