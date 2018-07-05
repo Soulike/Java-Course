@@ -4,12 +4,16 @@ public class Base64
 {
 
     private final static String INDEX_TABLE = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+    // 编码时，每次只需要取出高6位
     private final static int ENCODE_MASK = 0b11111100_00000000_00000000_00000000;
+    // 解码时，每次只需要取出高8位
     private final static int DECODE_MASK = 0b11111111_00000000_00000000_00000000;
+    // 去除byte提升的时候填充的符号位用
+    private final static int UNSIGNED_MASK = 0b00000000_00000000_00000000_11111111;
 
     public static String encode(byte[] binaryData)
     {
-        final int BYTES_LEFT = binaryData.length % 3;//最后剩余几个字节
+        final int BYTES_LEFT = binaryData.length % 3;//最后剩余几个字节不成组
         int suffixNum = 0;// 最后需要补几个'='
         if (BYTES_LEFT == 1)
         {
@@ -19,38 +23,44 @@ public class Base64
         {
             suffixNum = 1;
         }
+        // 当最后有剩余不足3字节的字符时，增加一组以补全
         int groupNum = BYTES_LEFT == 0 ? binaryData.length / 3 : binaryData.length / 3 + 1;
+        // 构建Base64串字符串
         StringBuilder encodedStr = new StringBuilder();
-        int buffer = 0;
-        int temp = 0;
+        // 存放一组当前处理的24位
+        int buffer24Bits = 0;
+        // 存放一个当前处理的6位
+        int buffer6Bits = 0;
 
-
+        // 逐个24字节处理，循环完成后有效的24字节将在int的高位
         for (int i = 0; i < groupNum; i++)
         {
+            // 从字节数组中取出3个字节放入 buffer24Bits
             for (int j = 0; j < 3; j++)
             {
-
-                if (i * 3 + j >= binaryData.length)
+                // 只有数组中还有数据的时候去取。如果取完了没凑够一组，就直接移位（相当于补0）
+                if (i * 3 + j < binaryData.length)
                 {
-                    buffer += 0;
+                    //提升到 int 并删除所有符号位，仅保留最后八位
+                    buffer24Bits += (int) binaryData[i * 3 + j] & UNSIGNED_MASK;
                 }
-                else
-                {
-                    buffer += binaryData[i * 3 + j];
-                }
-                buffer <<= 8;
+                // 每次加完后移动到高位
+                buffer24Bits <<= 8;
             }
+
+            // 分4组取出24位
             for (int j = 0; j < 4; j++)
             {
-                temp = buffer & ENCODE_MASK;
-                buffer <<= 6;
-                encodedStr.append(INDEX_TABLE.charAt(temp >>> 26));
+                // 取出高位6位
+                buffer6Bits = buffer24Bits & ENCODE_MASK;
+                // 将高6位删除
+                buffer24Bits <<= 6;
+                // 把这6位移动到低位，查表找对应字符
+                encodedStr.append(INDEX_TABLE.charAt(buffer6Bits >>> 26));
             }
         }
-        for (int i = 0; i < suffixNum; i++)
-        {
-            encodedStr.delete(encodedStr.length() - 1, encodedStr.length());
-        }
+        // 后缀处理。如果最后有补全的0那么会出现A，根据规则应当补充=，所以删除末尾的A换成=
+        encodedStr.delete(encodedStr.length() - suffixNum, encodedStr.length());
         for (int i = 0; i < suffixNum; i++)
         {
             encodedStr.append('=');
@@ -102,8 +112,8 @@ public class Base64
 
     public static void main(String[] args)
     {
-        //byte[] a = {1, 2, 3, -7, -9, 110};
-        byte[] a = "nvwielouhnviwue".getBytes();
+        byte[] a = {1, 2, 3, -7, -9, 110};
+        //byte[] a = "dawdawdfwefewf".getBytes();
 
         for (int i = 0; i < a.length; i++)
         {
