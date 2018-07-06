@@ -30,7 +30,11 @@ public class EightQueens
             // 方案数加1
 
             ways++;
-
+            for (int i : a)
+            {
+                System.out.printf("%2d", i);
+            }
+            System.out.println();
             // 可以将a[n]的值输出，此处代码省略
 
         }
