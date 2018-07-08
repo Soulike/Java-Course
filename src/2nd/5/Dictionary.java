@@ -91,6 +91,7 @@ public class Dictionary
     }
 
     // 寻找文件中是否存在这个单词的解释，返回其位置。如果不存在返回0
+    // TODO: 检测有BUG
     private int find(String word) throws IOException
     {
         try (Scanner scanner = new Scanner(file, StandardCharsets.UTF_8))
