@@ -1,5 +1,4 @@
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 /*编写程序求出1万以内的所有素数，然后再判断这些素数中哪些是由素数拼接而成的。
     例如素数23就符合条件，23本身是素数，其由素数2，和素数3拼接（连接）组成。

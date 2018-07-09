@@ -1,10 +1,7 @@
-import java.io.File;
-import java.io.IOException;
-import java.io.PrintWriter;
+import java.io.*;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 /*编写程序求出1万以内的所有素数，并将这些素数输出到一个文本文件中，每行文本只包含一个素数数据。
     该文本文件内容要求可以用记事本程序来查看。*/
