@@ -1,14 +1,14 @@
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.nio.file.*;
+import java.io.*;
 
 //文件名称，文件路径，文件大小
-public class File implements Cloneable
+public class MyFile implements Cloneable
 {
     private final String name;
     private final Path path;
     private final long size;
 
-    public File(String name, String pathStr, long size)
+    public MyFile(String name, String pathStr, long size)
     {
         this.name = name;
         this.path = Paths.get(pathStr);
@@ -28,7 +28,7 @@ public class File implements Cloneable
         }
         else
         {
-            File file = (File) obj;
+            MyFile file = (MyFile) obj;
             return this.name.equals(file.name) && this.size == file.size;
         }
     }

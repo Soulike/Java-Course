@@ -1,5 +1,6 @@
 import java.nio.file.*;
 import java.util.*;
+import java.io.*;
 
 public class FileVisitor
 {
@@ -10,17 +11,17 @@ public class FileVisitor
         this.folderPath = Paths.get(folderPathStr);
     }
 
-    private void getAllFilesRecursive(Path folderPath, List<File> fileList)
+    private void getAllFilesRecursive(Path folderPath, List<MyFile> fileList)
     {
-        java.io.File folder = folderPath.toFile();
+        File folder = folderPath.toFile();
         // 得到文件夹下的列表
-        java.io.File[] files = folder.listFiles();
+        File[] files = folder.listFiles();
         // 遍历，如果是目录就递归下去。如果是文件就放进list
-        for (java.io.File file : files)
+        for (File file : files)
         {
             if (file.isFile())
             {
-                fileList.add(new File(file.getName(), file.getAbsolutePath(), file.length()));
+                fileList.add(new MyFile(file.getName(), file.getAbsolutePath(), file.length()));
             }
             else if (file.isDirectory())
             {
@@ -29,9 +30,9 @@ public class FileVisitor
         }
     }
 
-    public List<File> getAllFiles()
+    public List<MyFile> getAllFiles()
     {
-        List<File> fileList = new ArrayList<>();
+        List<MyFile> fileList = new ArrayList<>();
         getAllFilesRecursive(folderPath, fileList);
         return fileList;
     }

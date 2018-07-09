@@ -19,20 +19,20 @@ public class FileRepeatSearcher
         }
     }
 
-    private List<File> getAllFiles()
+    private List<MyFile> getAllFiles()
     {
         FileVisitor visitor = new FileVisitor(folderPath.toString());
         return visitor.getAllFiles();
     }
 
-    public List<File> getRepeatedFiles()
+    public List<MyFile> getRepeatedFiles()
     {
         // 准备两份文件列表，一份用于删除，一份用于检查
-        List<File> fileList = getAllFiles();
-        List<File> fileListCopy = new LinkedList<>(fileList);
-        List<File> repeatedFileList = new ArrayList<>();
+        List<MyFile> fileList = getAllFiles();
+        List<MyFile> fileListCopy = new LinkedList<>(fileList);
+        List<MyFile> repeatedFileList = new ArrayList<>();
 
-        for (File file : fileList)
+        for (MyFile file : fileList)
         {
             // 从列表中抹掉文件，检查是不是重复的，是重复的就放到列表里面
             fileListCopy.remove(file);
@@ -55,14 +55,14 @@ public class FileRepeatSearcher
             else
             {
                 FileRepeatSearcher searcher = new FileRepeatSearcher(args[0]);
-                List<File> repeatedFileList = searcher.getRepeatedFiles();
+                List<MyFile> repeatedFileList = searcher.getRepeatedFiles();
                 if (repeatedFileList.size() == 0)
                 {
                     System.out.println("没有重复文件");
                 }
                 else
                 {
-                    for (File file : repeatedFileList)
+                    for (MyFile file : repeatedFileList)
                     {
                         file.showFile();
                     }
