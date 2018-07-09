@@ -9,7 +9,7 @@ import java.util.List;
 public class PrimeNumberCalculator
 {
     private List<Integer> primeNumberList;
-    private final int LIMIT = 10000;
+    private final static int LIMIT = 10000;
 
     public PrimeNumberCalculator()
     {
@@ -76,7 +76,7 @@ public class PrimeNumberCalculator
                 } while (numberStr.charAt(0) == '0');
 
                 // 如果前后字符串都是素数或前后字符串都是由素数组成的，则符合条件
-                if (isConnectedByPrimeNumbers(Integer.valueOf(numberFront.toString())) && isConnectedByPrimeNumbers(Integer.valueOf(numberStr.toString())))
+                if (isConnectedByPrimeNumbers(numberFront.toString()) && isConnectedByPrimeNumbers(numberStr.toString()))
                 {
                     return true;
                 }
@@ -96,17 +96,21 @@ public class PrimeNumberCalculator
         return primeNumberList.contains(number);
     }
 
-    // 判断数字是不是由素数拼接而成，如果这个数是素数就直接返回true
-    private boolean isConnectedByPrimeNumbers(int number)
+    // 判断数字字符串是不是由素数拼接而成，如果这个数是素数就直接返回true
+    private boolean isConnectedByPrimeNumbers(String numberStr)
     {
-        if (isPrimeNumber(number))
+        // 如果第一位是0，直接打回
+        if (numberStr.charAt(0) == '0')
+        {
+            return false;
+        }
+        else if (isPrimeNumber(Integer.parseInt(numberStr)))
         {
             return true;
         }
         else
         {
-            String numberStr = String.valueOf(number);
-            return isPrimeNumber(Integer.parseInt(numberStr.substring(0, 1))) && isConnectedByPrimeNumbers(Integer.parseInt(numberStr.substring(1)));
+            return isPrimeNumber(Integer.parseInt(numberStr.substring(0, 1))) && isConnectedByPrimeNumbers(numberStr.substring(1));
         }
     }
 
