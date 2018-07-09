@@ -9,7 +9,7 @@ import java.util.List;
 public class PrimeNumberCalculator
 {
     private List<Integer> primeNumberList;
-    private final static int LIMIT = 10000;
+    private final static int LIMIT = 100000;
 
     public PrimeNumberCalculator()
     {
@@ -61,7 +61,7 @@ public class PrimeNumberCalculator
         }
     }
 
-    public boolean isValidPrimeNumber(int number)
+    private boolean isValidPrimeNumber(int number)
     {
         String numberStr = String.valueOf(number);
         // 将数字字符串所有的两两分割情况递归

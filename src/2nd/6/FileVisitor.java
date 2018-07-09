@@ -1,13 +1,23 @@
-import java.io.IOException;
-import java.nio.file.FileVisitResult;
-import java.nio.file.SimpleFileVisitor;
+import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.util.List;
 
-public class FileVisitor extends SimpleFileVisitor
+public class FileVisitor extends SimpleFileVisitor<Path>
 {
-   /* @Override
-    public FileVisitResult visitFile(Object file, BasicFileAttributes attrs) throws IOException
-    {
+    private List<File> fileList;
 
-    }*/
+    public FileVisitor(List<File> fileList)
+    {
+        super();
+        this.fileList = fileList;
+    }
+
+    @Override
+    public FileVisitResult visitFile(Path file, BasicFileAttributes attrs)
+    {
+        java.io.File fileObj = file.toFile();
+        File customFile = new File(fileObj.getName(), fileObj.getAbsolutePath(), fileObj.length());
+        fileList.add(customFile);
+        return FileVisitResult.CONTINUE;
+    }
 }
