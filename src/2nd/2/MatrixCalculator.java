@@ -105,7 +105,8 @@ public class MatrixCalculator
         return num;
     }
 
-    private int slantedCalculate(int row, int col)
+    // 从左上到右下
+    private int mainSlantedCalculate(int row, int col)
     {
         int num = 0;//连续1的个数
         // 如果他自己都不是1，那就直接返回0
@@ -134,6 +135,49 @@ public class MatrixCalculator
         return num;
     }
 
+    // 从右上到左下
+    private int viceSlantedCalculate(int row, int col)
+    {
+        int num = 0;//连续1的个数
+        // 如果他自己都不是1，那就直接返回0
+        if (matrix[row][col] == 1)
+        {
+            int rowCopy = row;
+            int colCopy = col;
+            // 先向右上找
+            while (rowCopy >= 0 && colCopy <= MATRIX_SIZE - 1 && matrix[rowCopy][colCopy] == 1)
+            {
+                num++;
+                rowCopy--;
+                colCopy++;
+            }
+
+            // 再向左下找
+            rowCopy = row + 1;
+            colCopy = col - 1;
+            while (rowCopy <= MATRIX_SIZE - 1 && colCopy >= 0 && matrix[rowCopy][colCopy] == 1)
+            {
+                num++;
+                rowCopy++;
+                colCopy--;
+            }
+        }
+        return num;
+    }
+
+    private int max(int... arr)
+    {
+        int max = arr[0];
+        for (int i : arr)
+        {
+            if (i > max)
+            {
+                max = i;
+            }
+        }
+        return max;
+    }
+
     // 新建一个矩阵，对所有位置进行以上三个函数的运算，取最大值。最后再取这个矩阵的最大值
     public int calculate()
     {
@@ -142,7 +186,7 @@ public class MatrixCalculator
         {
             for (int col = 0; col < MATRIX_SIZE; col++)
             {
-                maxMatrix[row][col] = Math.max(Math.max(horizontalCalculate(row, col), verticalCalculate(row, col)), slantedCalculate(row, col));
+                maxMatrix[row][col] = max(horizontalCalculate(col, row), verticalCalculate(col, row), mainSlantedCalculate(row, col), viceSlantedCalculate(row, col));
             }
         }
         int maxVal = 0;
