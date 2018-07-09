@@ -1,23 +1,39 @@
 import java.nio.file.*;
-import java.nio.file.attribute.BasicFileAttributes;
-import java.util.List;
+import java.util.*;
 
-public class FileVisitor extends SimpleFileVisitor<Path>
+public class FileVisitor
 {
-    private List<File> fileList;
+    private final Path folderPath;
 
-    public FileVisitor(List<File> fileList)
+    public FileVisitor(String folderPathStr)
     {
-        super();
-        this.fileList = fileList;
+        this.folderPath = Paths.get(folderPathStr);
     }
 
-    @Override
-    public FileVisitResult visitFile(Path file, BasicFileAttributes attrs)
+    private void getAllFilesRecursive(Path folderPath, List<File> fileList)
     {
-        java.io.File fileObj = file.toFile();
-        File customFile = new File(fileObj.getName(), fileObj.getAbsolutePath(), fileObj.length());
-        fileList.add(customFile);
-        return FileVisitResult.CONTINUE;
+        java.io.File folder = folderPath.toFile();
+        // 得到文件夹下的列表
+        java.io.File[] files = folder.listFiles();
+        // 遍历，如果是目录就递归下去。如果是文件就放进list
+        for (java.io.File file : files)
+        {
+            if (file.isFile())
+            {
+                fileList.add(new File(file.getName(), file.getAbsolutePath(), file.length()));
+            }
+            else if (file.isDirectory())
+            {
+                getAllFilesRecursive(file.toPath(), fileList);
+            }
+        }
     }
+
+    public List<File> getAllFiles()
+    {
+        List<File> fileList = new ArrayList<>();
+        getAllFilesRecursive(folderPath, fileList);
+        return fileList;
+    }
+
 }

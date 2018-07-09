@@ -1,4 +1,3 @@
-import java.io.IOException;
 import java.nio.file.*;
 import java.util.*;
 
@@ -20,21 +19,22 @@ public class FileRepeatSearcher
         }
     }
 
-    private List<File> getAllFiles() throws IOException
+    private List<File> getAllFiles()
     {
-        List<File> fileList = new LinkedList<>();
-        FileVisitor fileVisitor = new FileVisitor(fileList);
-        Files.walkFileTree(folderPath, fileVisitor);
-        return fileList;
+        FileVisitor visitor = new FileVisitor(folderPath.toString());
+        return visitor.getAllFiles();
     }
 
-    public List<File> getRepeatedFiles() throws IOException
+    public List<File> getRepeatedFiles()
     {
+        // 准备两份文件列表，一份用于删除，一份用于检查
         List<File> fileList = getAllFiles();
-        List<File> fileListCopy = new ArrayList<>(fileList);
+        List<File> fileListCopy = new LinkedList<>(fileList);
         List<File> repeatedFileList = new ArrayList<>();
+
         for (File file : fileList)
         {
+            // 从列表中抹掉文件，检查是不是重复的，是重复的就放到列表里面
             fileListCopy.remove(file);
             if (fileListCopy.contains(file) || repeatedFileList.contains(file))
             {
@@ -72,11 +72,6 @@ public class FileRepeatSearcher
         catch (IllegalArgumentException e)
         {
             System.out.println("参数无效。请指定有效且存在文件夹");
-        }
-        catch (IOException e)
-        {
-            System.out.println("IO 错误");
-            e.printStackTrace();
         }
     }
 }
