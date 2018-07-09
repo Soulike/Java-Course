@@ -1,8 +1,7 @@
 import java.nio.file.*;
-import java.io.*;
 
 //文件名称，文件路径，文件大小
-public class MyFile implements Cloneable
+public class MyFile
 {
     private final String name;
     private final Path path;
