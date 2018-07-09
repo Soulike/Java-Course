@@ -12,20 +12,24 @@ import java.util.Scanner;
     以前的解释数据。*/
 public class Dictionary
 {
-    private final URI uri;
+    private final Path path;
     private final String WORD_PREFIX = "%%~WORD||";
     private final String DESCRIPTION_PREFIX = "%%~DESCRIPTION||";
     private final String WORD_SEPARATOR = "--";
 
     public Dictionary(String filePath) throws IOException, URISyntaxException
     {
-        this.uri = new URI(filePath);
-        File file = new File(uri);
-        if (!file.exists())
+        // 从用户输入路径创建一个Path对象
+        this.path = Paths.get(filePath);
+        // 创建文件夹
+        if (Files.notExists(path.getParent()))
         {
-            File dir = new File(file.getParent());
-            dir.mkdirs();
-            file.createNewFile();
+            Files.createDirectories(path.getParent());
+        }
+        // 如果文件不存在，就创建文件
+        if (Files.notExists(path))
+        {
+            Files.createFile(path);
         }
     }
 
@@ -41,7 +45,7 @@ public class Dictionary
      * */
     public void add(String word, String description) throws IOException, URISyntaxException
     {
-        File file = new File(uri);
+        File file = path.toFile();
         // 先寻找是不是已经存在这个单词了，如果存在得到的是所在行数
         int lineToDeleteNum = find(word);
         // 先将新的解释放到文件末尾
@@ -53,14 +57,8 @@ public class Dictionary
         if (lineToDeleteNum != 0)
         {
             // 创建一个临时文件
-            URI tempUri = new URI(file.getParent() + "/~" + file.getName());
-            File tempFile = new File(tempUri);
-            if (!tempFile.exists())
-            {
-                File dir = new File(tempFile.getParent());
-                dir.mkdirs();
-                tempFile.createNewFile();
-            }
+            Path tempFilePath = Files.createTempFile(null, ".dat");
+            File tempFile = tempFilePath.toFile();
 
             // 把想要保存的内容放到临时文件中，删除的内容忽略
             try (Scanner scanner = new Scanner(file, StandardCharsets.UTF_8); PrintWriter tempWritter = new PrintWriter(tempFile, StandardCharsets.UTF_8))
@@ -87,7 +85,7 @@ public class Dictionary
                     }
                 }
             }
-            Files.move(Paths.get(tempUri), Paths.get(uri), StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE);
+            Files.move(tempFilePath, path, StandardCopyOption.REPLACE_EXISTING);
         }
 
     }
@@ -96,7 +94,7 @@ public class Dictionary
     private int find(String word) throws IOException
     {
         String buffer;
-        File file = new File(uri);
+        File file = path.toFile();
         int lineNumber = 0;
         int lineNumberCopy = 0;
         try (Scanner scanner = new Scanner(file, StandardCharsets.UTF_8))
@@ -120,7 +118,7 @@ public class Dictionary
 
     public void print(String word) throws IOException
     {
-        File file = new File(uri);
+        File file = path.toFile();
         int lineNumber = find(word);
         String buffer;
         if (lineNumber != 0)
@@ -164,7 +162,7 @@ public class Dictionary
                 System.out.printf("请输入要进行的操作 %d-添加单词 %d-查询单词 %d-退出\n", ADD_WORD, FIND_WORD, EXIT);
                 operation = in.nextInt();
                 in.nextLine();
-                if (operation < 0 || operation > 3)
+                if (operation < ADD_WORD || operation > EXIT)
                 {
                     System.out.println("操作无效。请重新输入");
                 }
