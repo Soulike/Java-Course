@@ -38,7 +38,7 @@ public class PrimeNumberCalculator
         }
     }
 
-    public void getValidPrimeNumbers()
+    public List<Integer> getValidPrimeNumbers()
     {
         List<Integer> validPrimeNumberList = new ArrayList<>();
         for (int num : primeNumberList)
@@ -48,46 +48,56 @@ public class PrimeNumberCalculator
                 validPrimeNumberList.add(num);
             }
         }
-        System.out.printf("符合条件的素数有%d个\n", validPrimeNumberList.size());
+        return validPrimeNumberList;
+    }
+
+    public void printValidPrimeNumbers()
+    {
+        List<Integer> validPrimeNumberList = getValidPrimeNumbers();
+        System.out.printf("符合条件的素数共有%d个\n", validPrimeNumberList.size());
         for (int num : validPrimeNumberList)
         {
             System.out.printf("%d ", num);
         }
     }
 
-    private boolean isValidPrimeNumber(int number)
+    public boolean isValidPrimeNumber(int number)
     {
-        // 小于 10 的数不考虑
-        if (number < 10)
+        String numberStr = String.valueOf(number);
+        // 将数字字符串所有的两两分割情况递归
+        for (int i = 1; i < numberStr.length(); i++)
+        {
+            if (isValidPrimeNumberRecursive(numberStr.substring(0, i)) && isValidPrimeNumberRecursive(numberStr.substring(i)))
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean isValidPrimeNumberRecursive(String numberPart)
+    {
+        // 如果第一位是0，那么直接认为不是素数
+        if (numberPart.charAt(0) == '0')
         {
             return false;
         }
+        // 如果这个数已经是素数，那就不用继续分割了
+        else if (isPrimeNumber(Integer.parseInt(numberPart)))
+        {
+            return true;
+        }
+        // 继续两两分割递归
         else
         {
-            StringBuilder numberStr = new StringBuilder(String.valueOf(number));
-            StringBuilder numberFront = new StringBuilder();//数字的前几位
-            while (true)
+            for (int i = 1; i < numberPart.length(); i++)
             {
-                // 后字符串第一位不能是0，直接全部丢到前字符串
-                do
-                {
-                    numberFront.append(numberStr.substring(0, 1));//拿出第一位数字放入前字符串
-                    numberStr.delete(0, 1);//后字符串删除第一位
-                } while (numberStr.charAt(0) == '0');
-
-                // 如果前后字符串都是素数或前后字符串都是由素数组成的，则符合条件
-                if (isConnectedByPrimeNumbers(numberFront.toString()) && isConnectedByPrimeNumbers(numberStr.toString()))
+                if (isValidPrimeNumberRecursive(numberPart.substring(0, i)) && isValidPrimeNumberRecursive(numberPart.substring(i)))
                 {
                     return true;
                 }
-                // 只要有一个不是素数
-                // 后字符串只剩下一位了，那这个数字不可能是素数组合而成
-                // 如果不只剩下一位，重复以上过程
-                else if (numberStr.length() == 1)
-                {
-                    return false;
-                }
             }
+            return false;
         }
     }
 
@@ -96,27 +106,9 @@ public class PrimeNumberCalculator
         return primeNumberList.contains(number);
     }
 
-    // 判断数字字符串是不是由素数拼接而成，如果这个数是素数就直接返回true
-    private boolean isConnectedByPrimeNumbers(String numberStr)
-    {
-        // 如果第一位是0，直接打回
-        if (numberStr.charAt(0) == '0')
-        {
-            return false;
-        }
-        else if (isPrimeNumber(Integer.parseInt(numberStr)))
-        {
-            return true;
-        }
-        else
-        {
-            return isPrimeNumber(Integer.parseInt(numberStr.substring(0, 1))) && isConnectedByPrimeNumbers(numberStr.substring(1));
-        }
-    }
-
     public static void main(String[] args)
     {
         PrimeNumberCalculator calculator = new PrimeNumberCalculator();
-        calculator.getValidPrimeNumbers();
+        calculator.printValidPrimeNumbers();
     }
 }
