@@ -3,6 +3,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
 import java.util.*;
 //TODO: 添加注释
+
 /**
  * 可以为这个类添加额外的方法及数据成员.
  * ID就是指学号, 下面的作者一定要写上你的名字和学号
@@ -17,6 +18,10 @@ public class TextZip
 
     //ID, 该学号的值需要修改!
     private static final String ID = "abdc001";
+
+    private static final String FREQ_START = "#|";
+    private static final String FREQ_END = "|@";
+    private static final String FREQ_MID = ":~";
 
 
     /**
@@ -208,7 +213,7 @@ public class TextZip
 
         for (char key : freqMap.keySet())
         {
-            pw.println(String.format("||%c:~%d||", key, freqMap.get(key)));
+            pw.println(String.format("%s%c%s%d%s", FREQ_START, key, FREQ_MID, freqMap.get(key), FREQ_END));
             list.add(new TreeNode(new CharFreq(key, freqMap.get(key))));
         }
         return list;
@@ -297,7 +302,6 @@ public class TextZip
     {
 
         // IMPLEMENT THIS METHOD
-        Path inputFreqFilePath = Paths.get(inputFreqFile);
         Reader reader = new InputStreamReader(new FileInputStream(inputFreqFile), StandardCharsets.UTF_8);
         ArrayList<TreeNode> treeNodeArrayList = new ArrayList<>();
         int c;
@@ -308,12 +312,12 @@ public class TextZip
         {
             stringBuilder.append((char) c);
             buffer = stringBuilder.toString().trim();
-            if (buffer.length() >= 7)
+            if (buffer.length() >= FREQ_START.length() + FREQ_MID.length() + FREQ_END.length() + 2)
             {
-                if (buffer.charAt(0) == '|' && buffer.charAt(1) == '|' && buffer.charAt(buffer.length() - 2) == '|' && buffer.charAt(buffer.length() - 1) == '|')
+                if (buffer.substring(0, FREQ_START.length()).equals(FREQ_START) && buffer.substring(buffer.length() - FREQ_END.length()).equals(FREQ_END))
                 {
                     buffer = buffer.substring(2, buffer.length() - 2);
-                    charFreqParts = buffer.split(":~");
+                    charFreqParts = buffer.split(FREQ_MID);
                     treeNodeArrayList.add(new TreeNode(new CharFreq(charFreqParts[0].charAt(0), Integer.parseInt(charFreqParts[1]))));
                     stringBuilder.delete(0, stringBuilder.length());
                 }
