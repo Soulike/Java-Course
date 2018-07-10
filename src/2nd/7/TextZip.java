@@ -208,7 +208,7 @@ public class TextZip
 
         for (char key : freqMap.keySet())
         {
-            pw.println(String.format("||%c:%d||", key, freqMap.get(key)));
+            pw.println(String.format("||%c:~%d||", key, freqMap.get(key)));
             list.add(new TreeNode(new CharFreq(key, freqMap.get(key))));
         }
         return list;
@@ -313,7 +313,7 @@ public class TextZip
                 if (buffer.charAt(0) == '|' && buffer.charAt(1) == '|' && buffer.charAt(buffer.length() - 2) == '|' && buffer.charAt(buffer.length() - 1) == '|')
                 {
                     buffer = buffer.substring(2, buffer.length() - 2);
-                    charFreqParts = buffer.split(":");
+                    charFreqParts = buffer.split(":~");
                     treeNodeArrayList.add(new TreeNode(new CharFreq(charFreqParts[0].charAt(0), Integer.parseInt(charFreqParts[1]))));
                     stringBuilder.delete(0, stringBuilder.length());
                 }
