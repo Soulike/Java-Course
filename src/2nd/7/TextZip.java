@@ -1,9 +1,7 @@
 import java.io.*;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.*;
 import java.util.*;
 //TODO: 添加注释
-//TODO: 只有一个字符情况
 
 /**
  * 可以为这个类添加额外的方法及数据成员.
@@ -64,33 +62,34 @@ public class TextZip
     {
 
         // IMPLEMENT THIS METHOD
-
-        TreeNode currentTreeNode = huffman;
-        while (br.hasNext())
+        if (huffman != null)
         {
-            // 下一位是0，向左
-            if (!br.next())
+            TreeNode currentTreeNode = huffman;
+            while (br.hasNext())
             {
-                currentTreeNode = currentTreeNode.getLeft();
+                // 下一位是0，向左
+                if (!br.next())
+                {
+                    currentTreeNode = currentTreeNode.getLeft();
+                }
+                // 下一位是1，向右
+                else
+                {
+                    currentTreeNode = currentTreeNode.getRight();
+                }
+                // 如果是叶子结点，必然是一个字符
+                if (currentTreeNode.isLeaf())
+                {
+                    char c = ((CharFreq) currentTreeNode.getItem()).getChar();
+                    fw.append(c);
+                    currentTreeNode = huffman;
+                }
             }
-            // 下一位是1，向右
-            else
+            if (currentTreeNode != huffman)
             {
-                currentTreeNode = currentTreeNode.getRight();
-            }
-            // 如果是叶子结点，必然是一个字符
-            if (currentTreeNode.isLeaf())
-            {
-                char c = ((CharFreq) currentTreeNode.getItem()).getChar();
-                fw.append(c);
-                currentTreeNode = huffman;
+                throw new Exception("压缩文件不完整");
             }
         }
-        if (currentTreeNode != huffman)
-        {
-            throw new Exception("压缩文件不完整");
-        }
-
     }
 
     /**
@@ -101,38 +100,49 @@ public class TextZip
      *          code a String used to build the code for each character as
      *          the tree is traversed recursively
      */
-    public static void traverse(TreeNode t, String code)
+    public static void traverses(TreeNode t, String code)
     {
 
         // IMPLEMENT THIS METHOD
-        if (t.isLeaf())
+        if (t != null)
         {
-            System.out.printf("%s: %s\n", ((CharFreq) t.getItem()).getChar(), code);
-        }
-        else
-        {
-            if (t.getLeft() != null)
+            if (t.isLeaf())
             {
-                String codeCopy = code.concat("0");
-                traverse(t.getLeft(), codeCopy);
+                System.out.printf("%s: %s\n", ((CharFreq) t.getItem()).getChar(), code);
             }
-            if (t.getRight() != null)
+            else
             {
-                String codeCopy = code.concat("1");
-                traverse(t.getRight(), codeCopy);
+                if (t.getLeft() != null)
+                {
+                    String codeCopy = code.concat("0");
+                    traverses(t.getLeft(), codeCopy);
+                }
+                if (t.getRight() != null)
+                {
+                    String codeCopy = code.concat("1");
+                    traverses(t.getRight(), codeCopy);
+                }
             }
         }
     }
 
-    public static TreeMap<Character, String> traverse(TreeNode root)
+    public static TreeMap<Character, String> getCodes(TreeNode root)
     {
         TreeMap<Character, String> charMap = new TreeMap<>();
         String code = "";
-        traverseRecursive(root, code, charMap);
+        if (root.isLeaf())
+        {
+            code = code.concat("0");
+            charMap.put(((CharFreq) root.getItem()).getChar(), code);
+        }
+        else
+        {
+            getCodesRecursive(root, code, charMap);
+        }
         return charMap;
     }
 
-    private static void traverseRecursive(TreeNode root, String code, TreeMap<Character, String> charMap)
+    private static void getCodesRecursive(TreeNode root, String code, TreeMap<Character, String> charMap)
     {
         if (root.isLeaf())
         {
@@ -144,13 +154,13 @@ public class TextZip
             if (root.getLeft() != null)
             {
                 String codeCopy = code.concat("0");
-                traverseRecursive(root.getLeft(), codeCopy, charMap);
+                getCodesRecursive(root.getLeft(), codeCopy, charMap);
             }
 
             if (root.getRight() != null)
             {
                 String codeCopy = code.concat("1");
-                traverseRecursive(root.getRight(), codeCopy, charMap);
+                getCodesRecursive(root.getRight(), codeCopy, charMap);
             }
         }
     }
@@ -201,7 +211,7 @@ public class TextZip
 
         // IMPLEMENT THIS METHOD
         char[] buffer = new char[1024];
-        int readLength = 0;
+        int readLength;
         TreeMap<Character, Integer> freqMap = new TreeMap<>();
         ArrayList<TreeNode> list = new ArrayList<>();
         while ((readLength = fr.read(buffer)) != -1)
@@ -239,15 +249,29 @@ public class TextZip
     {
 
         // IMPLEMENT THIS METHOD
-        TreeNode smallest;
-        TreeNode secondSmallest;
-        int freqSum = 0;
-        while (trees.size() != 1)
+        if (trees.size() == 0)
         {
-            smallest = removeMin(trees);
-            secondSmallest = removeMin(trees);
-            freqSum = ((CharFreq) smallest.getItem()).getFreq() + ((CharFreq) secondSmallest.getItem()).getFreq();
-            trees.add(new TreeNode(new CharFreq('\0', freqSum), smallest, secondSmallest));
+            return null;
+        }
+        else if (trees.size() == 1)
+        {
+            TreeNode node = (TreeNode) trees.get(0);
+            CharFreq charFreq = (CharFreq) node.getItem();
+            trees.remove(0);
+            trees.add(new TreeNode(new CharFreq(charFreq.getChar(), charFreq.getFreq()), node, null));
+        }
+        else
+        {
+            TreeNode smallest;
+            TreeNode secondSmallest;
+            int freqSum = 0;
+            while (trees.size() != 1)
+            {
+                smallest = removeMin(trees);
+                secondSmallest = removeMin(trees);
+                freqSum = ((CharFreq) smallest.getItem()).getFreq() + ((CharFreq) secondSmallest.getItem()).getFreq();
+                trees.add(new TreeNode(new CharFreq('\0', freqSum), smallest, secondSmallest));
+            }
         }
         return (TreeNode) trees.get(0);
     }
@@ -268,22 +292,24 @@ public class TextZip
     {
 
         // IMPLEMENT THIS METHOD
-        TreeMap<Character, String> charMap = traverse(huffman);
-        int c;
-        String code;
-        while ((c = fr.read()) != -1)
+        if (huffman != null)
         {
-            code = charMap.get((char) c);
-            if (code == null || code.length() == 0)
+            TreeMap<Character, String> charMap = getCodes(huffman);
+            int c;
+            String code;
+            while ((c = fr.read()) != -1)
             {
-                throw new Exception("字符编码为空");
-            }
-            for (int i = 0; i < code.length(); i++)
-            {
-                bw.writeBit(Integer.parseInt(code.substring(i, i + 1)));
+                code = charMap.get((char) c);
+                if (code == null || code.length() == 0)
+                {
+                    throw new Exception("字符编码为空");
+                }
+                for (int i = 0; i < code.length(); i++)
+                {
+                    bw.writeBit(Integer.parseInt(code.substring(i, i + 1)));
+                }
             }
         }
-
     }
 
     /**
@@ -401,7 +427,7 @@ public class TextZip
             TreeNode n = buildTree(trees);
 
             // Display the codes
-            traverse(n, "");
+            traverses(n, "");
         }
 
 
