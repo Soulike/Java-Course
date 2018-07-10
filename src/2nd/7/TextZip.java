@@ -3,6 +3,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
 import java.util.*;
 //TODO: 添加注释
+//TODO: 只有一个字符情况
 
 /**
  * 可以为这个类添加额外的方法及数据成员.
