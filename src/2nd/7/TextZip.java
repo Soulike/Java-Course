@@ -120,8 +120,24 @@ public class TextZip
     {
 
         // IMPLEMENT THIS METHOD
+        char[] buffer = new char[64];
+        int readLength = 0;
+        HashMap<Character, Integer> freqMap = new HashMap<>();
+        ArrayList<CharFreq> list = new ArrayList<>();
+        while ((readLength = fr.read(buffer)) != -1)
+        {
+            for (int i = 0; i < readLength; i++)
+            {
+                freqMap.compute(buffer[i], (key, val) -> (val == null) ? 0 : val + 1);
+            }
+        }
 
-
+        for (char key : freqMap.keySet())
+        {
+            pw.printf("%c %d", key, freqMap.get(key));
+            list.add(new CharFreq(key, freqMap.get(key)));
+        }
+        return list;
     }
 
     /**
