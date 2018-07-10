@@ -8,7 +8,7 @@ import java.util.*;
 public class PrimeNumberCalculator
 {
     private List<Integer> primeNumberList;
-    private final static int LIMIT = 100000;
+    private final static int LIMIT = 10000;
 
     public PrimeNumberCalculator()
     {

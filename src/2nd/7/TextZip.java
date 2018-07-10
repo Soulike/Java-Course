@@ -1,4 +1,7 @@
 import java.io.*;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
 
 /**
@@ -57,6 +60,31 @@ public class TextZip
 
         // IMPLEMENT THIS METHOD
 
+        TreeNode currentTreeNode = huffman;
+        while (br.hasNext())
+        {
+            // 下一位是0，向左
+            if (!br.next())
+            {
+                currentTreeNode = currentTreeNode.getLeft();
+            }
+            // 下一位是1，向右
+            else
+            {
+                currentTreeNode = currentTreeNode.getRight();
+            }
+            // 如果是叶子结点，必然是一个字符
+            if (currentTreeNode.isLeaf())
+            {
+                char c = ((CharFreq) currentTreeNode.getItem()).getChar();
+                fw.append(c);
+                currentTreeNode = huffman;
+            }
+        }
+        if (currentTreeNode != huffman)
+        {
+            throw new Exception("压缩文件不完整");
+        }
 
     }
 
@@ -72,7 +100,54 @@ public class TextZip
     {
 
         // IMPLEMENT THIS METHOD
+        if (t.isLeaf())
+        {
+            System.out.printf("%s: %s\n", ((CharFreq) t.getItem()).getChar(), code);
+        }
+        else
+        {
+            if (t.getLeft() != null)
+            {
+                String codeCopy = code.concat("0");
+                traverse(t.getLeft(), codeCopy);
+            }
+            if (t.getRight() != null)
+            {
+                String codeCopy = code.concat("1");
+                traverse(t.getRight(), codeCopy);
+            }
+        }
+    }
 
+    public static TreeMap<Character, String> traverse(TreeNode root)
+    {
+        TreeMap<Character, String> charMap = new TreeMap<>();
+        String code = "";
+        traverseRecursive(root, code, charMap);
+        return charMap;
+    }
+
+    private static void traverseRecursive(TreeNode root, String code, TreeMap<Character, String> charMap)
+    {
+        if (root.isLeaf())
+        {
+            char c = ((CharFreq) root.getItem()).getChar();
+            charMap.put(c, code);
+        }
+        else
+        {
+            if (root.getLeft() != null)
+            {
+                String codeCopy = code.concat("0");
+                traverseRecursive(root.getLeft(), codeCopy, charMap);
+            }
+
+            if (root.getRight() != null)
+            {
+                String codeCopy = code.concat("1");
+                traverseRecursive(root.getRight(), codeCopy, charMap);
+            }
+        }
     }
 
     /**
@@ -122,20 +197,20 @@ public class TextZip
         // IMPLEMENT THIS METHOD
         char[] buffer = new char[64];
         int readLength = 0;
-        HashMap<Character, Integer> freqMap = new HashMap<>();
-        ArrayList<CharFreq> list = new ArrayList<>();
+        TreeMap<Character, Integer> freqMap = new TreeMap<>();
+        ArrayList<TreeNode> list = new ArrayList<>();
         while ((readLength = fr.read(buffer)) != -1)
         {
             for (int i = 0; i < readLength; i++)
             {
-                freqMap.compute(buffer[i], (key, val) -> (val == null) ? 0 : val + 1);
+                freqMap.compute(buffer[i], (key, val) -> (val == null) ? 1 : val + 1);
             }
         }
 
         for (char key : freqMap.keySet())
         {
-            pw.printf("%c %d", key, freqMap.get(key));
-            list.add(new CharFreq(key, freqMap.get(key)));
+            pw.println(String.format("||%c:%d||", key, freqMap.get(key)));
+            list.add(new TreeNode(new CharFreq(key, freqMap.get(key))));
         }
         return list;
     }
@@ -159,7 +234,17 @@ public class TextZip
     {
 
         // IMPLEMENT THIS METHOD
-
+        TreeNode smallest;
+        TreeNode secondSmallest;
+        int freqSum = 0;
+        while (trees.size() != 1)
+        {
+            smallest = removeMin(trees);
+            secondSmallest = removeMin(trees);
+            freqSum = ((CharFreq) smallest.getItem()).getFreq() + ((CharFreq) secondSmallest.getItem()).getFreq();
+            trees.add(new TreeNode(new CharFreq('\0', freqSum), smallest, secondSmallest));
+        }
+        return (TreeNode) trees.get(0);
     }
 
     /**
@@ -178,6 +263,21 @@ public class TextZip
     {
 
         // IMPLEMENT THIS METHOD
+        TreeMap<Character, String> charMap = traverse(huffman);
+        int c;
+        String code;
+        while ((c = fr.read()) != -1)
+        {
+            code = charMap.get((char) c);
+            if (code == null || code.length() == 0)
+            {
+                throw new Exception("字符编码为空");
+            }
+            for (int i = 0; i < code.length(); i++)
+            {
+                bw.writeBit(Integer.parseInt(code.substring(i, i + 1)));
+            }
+        }
 
     }
 
@@ -198,6 +298,29 @@ public class TextZip
     {
 
         // IMPLEMENT THIS METHOD
+        Path inputFreqFilePath = Paths.get(inputFreqFile);
+        Reader reader = new InputStreamReader(new FileInputStream(inputFreqFile), StandardCharsets.UTF_8);
+        ArrayList<TreeNode> treeNodeArrayList = new ArrayList<>();
+        int c;
+        StringBuilder stringBuilder = new StringBuilder();
+        String buffer;
+        String[] charFreqParts;
+        while ((c = reader.read()) != -1)
+        {
+            stringBuilder.append((char) c);
+            buffer = stringBuilder.toString().trim();
+            if (buffer.length() >= 7)
+            {
+                if (buffer.charAt(0) == '|' && buffer.charAt(1) == '|' && buffer.charAt(buffer.length() - 2) == '|' && buffer.charAt(buffer.length() - 1) == '|')
+                {
+                    buffer = buffer.substring(2, buffer.length() - 2);
+                    charFreqParts = buffer.split(":");
+                    treeNodeArrayList.add(new TreeNode(new CharFreq(charFreqParts[0].charAt(0), Integer.parseInt(charFreqParts[1]))));
+                    stringBuilder.delete(0, stringBuilder.length());
+                }
+            }
+        }
+        return treeNodeArrayList;
     }
 
 	/* This TextZip application should support the following command line flags:
@@ -251,7 +374,11 @@ public class TextZip
             fw.close();
             // Output the compression ratio
             // Write your own implementation here.
-
+            File input = new File("a.txz");
+            File output = new File("a.txt");
+            System.out.printf("Input file size: %d bytes\n", input.length());
+            System.out.printf("Output file size: %d bytes\n", output.length());
+            System.out.printf("Compression ratio: %.2f%%\n", ((double) input.length()) / output.length() * 100);
         }
 
         else if (args[0].equals("-f"))
@@ -276,7 +403,6 @@ public class TextZip
 
         else if (args[0].equals("-c"))
         {
-
             FileReader fr = new FileReader(args[1]);
             PrintWriter pw = new PrintWriter(new FileWriter(args[2]));
             ArrayList trees = countFrequencies(fr, pw);
@@ -289,16 +415,29 @@ public class TextZip
 
             // IMPLEMENT NEXT
             // Finish the compress function here
+            fr = new FileReader(args[1]);
+            File input = new File(args[1]);
+            File output = new File(args[3]);
+            BitWriter bw = new BitWriter(output);
+            compress(fr, n, bw);
+
+            fr.close();
+            bw.close();
 
 
             // then output the compression ratio
             // Write your own implementation here.
-
+            System.out.printf("Input file size: %d bytes\n", input.length());
+            System.out.printf("Output file size: %d bytes\n", output.length());
+            System.out.printf("Compression ratio: %.2f%%\n", ((double) output.length()) / input.length() * 100);
 
         }
 
         else if (args[0].equals("-d"))
         {
+            /*given a compressed file (args[1]) and its corresponding frequency file
+		      (args[2]) and the name of the output decompressed text file (args[3]),
+		      this should decompress the file*/
             ArrayList a = readFrequencies(args[2]);
             TreeNode tn = buildTree(a);
             BitReader br = new BitReader(args[1]);
@@ -308,8 +447,11 @@ public class TextZip
 
             // Output the compression ratio
             // Write your own implementation here.
-
-
+            File input = new File(args[1]);
+            File output = new File(args[3]);
+            System.out.printf("Input file size: %d bytes\n", input.length());
+            System.out.printf("Output file size: %d bytes\n", output.length());
+            System.out.printf("Compression ratio: %.2f%%\n", ((double) input.length()) / output.length() * 100);
         }
     }
 }
