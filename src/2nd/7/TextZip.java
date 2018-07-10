@@ -199,7 +199,7 @@ public class TextZip
     {
 
         // IMPLEMENT THIS METHOD
-        char[] buffer = new char[64];
+        char[] buffer = new char[1024];
         int readLength = 0;
         TreeMap<Character, Integer> freqMap = new TreeMap<>();
         ArrayList<TreeNode> list = new ArrayList<>();
