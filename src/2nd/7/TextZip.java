@@ -1,7 +1,6 @@
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
-//TODO: 添加注释
 
 /**
  * 可以为这个类添加额外的方法及数据成员.
@@ -18,6 +17,13 @@ public class TextZip
     //ID, 该学号的值需要修改!
     private static final String ID = "abdc001";
 
+    /*频率文件每一条记录的开头、结尾与分隔符。主要是为了防止跨平台换行符问题
+     * 文件格式：
+     * #|F:~72|@
+     * #|G:~18|@
+     * #|H:~76|@
+     * #|I:~51|@
+     * */
     private static final String FREQ_START = "#|";
     private static final String FREQ_END = "|@";
     private static final String FREQ_MID = ":~";
@@ -62,6 +68,7 @@ public class TextZip
     {
 
         // IMPLEMENT THIS METHOD
+        // 仅当文件生成了哈夫曼树再进行操作
         if (huffman != null)
         {
             TreeNode currentTreeNode = huffman;
@@ -85,6 +92,7 @@ public class TextZip
                     currentTreeNode = huffman;
                 }
             }
+            // 如果文件结束了但是最后几位没对应字符，那必然是文件出了问题
             if (currentTreeNode != huffman)
             {
                 throw new Exception("压缩文件不完整");
@@ -130,6 +138,7 @@ public class TextZip
     {
         TreeMap<Character, String> charMap = new TreeMap<>();
         String code = "";
+        // 如果刚传进来就是叶子结点，那么整个树只有一个字符，特殊处理
         if (root.isLeaf())
         {
             code = code.concat("0");
@@ -214,6 +223,7 @@ public class TextZip
         int readLength;
         TreeMap<Character, Integer> freqMap = new TreeMap<>();
         ArrayList<TreeNode> list = new ArrayList<>();
+        // 把读到的字符次数记录到map中
         while ((readLength = fr.read(buffer)) != -1)
         {
             for (int i = 0; i < readLength; i++)
@@ -222,6 +232,7 @@ public class TextZip
             }
         }
 
+        // 再把map中内容放入文件和list中
         for (char key : freqMap.keySet())
         {
             pw.println(String.format("%s%c%s%d%s", FREQ_START, key, FREQ_MID, freqMap.get(key), FREQ_END));
@@ -249,10 +260,12 @@ public class TextZip
     {
 
         // IMPLEMENT THIS METHOD
+        // 如果传入的数组就没有结点，就直接返回null
         if (trees.size() == 0)
         {
             return null;
         }
+        // 如果传入的数组只有一个结点，那就特殊处理
         else if (trees.size() == 1)
         {
             TreeNode node = (TreeNode) trees.get(0);
@@ -338,6 +351,8 @@ public class TextZip
         while ((c = reader.read()) != -1)
         {
             stringBuilder.append((char) c);
+
+            // 去掉前后换行，看是不是符合一条记录的模式
             buffer = stringBuilder.toString().trim();
             if (buffer.length() >= FREQ_START.length() + FREQ_MID.length() + FREQ_END.length() + 2)
             {
