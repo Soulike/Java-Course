@@ -1,5 +1,4 @@
 import java.io.*;
-import java.net.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
 import java.util.Scanner;
@@ -16,7 +15,7 @@ public class Dictionary
     private final String DESCRIPTION_PREFIX = "%%~DESCRIPTION||";
     private final String WORD_SEPARATOR = "--";
 
-    public Dictionary(String filePath) throws IOException, URISyntaxException
+    public Dictionary(String filePath) throws IOException
     {
         // 从用户输入路径创建一个Path对象
         this.path = Paths.get(filePath);
@@ -42,16 +41,17 @@ public class Dictionary
      * %%~DESCRIPTION||
      * --
      * */
-    public void add(String word, String description) throws IOException, URISyntaxException
+    public void add(String word, String description) throws IOException
     {
-        File file = path.toFile();
-        // 先寻找是不是已经存在这个单词了，如果存在得到的是所在行数
-        int lineToDeleteNum = find(word);
+        // 先寻找是不是已经存在这个单词了，如果存在得到所在行数
+        final int lineToDeleteNum = find(word);
+
         // 先将新的解释放到文件末尾
-        try (FileWriter writer = new FileWriter(file, true))
+        try (Writer writer = new OutputStreamWriter(new FileOutputStream(path.toFile(), true), StandardCharsets.UTF_8))
         {
             writer.append(String.format("%s%s\n%s%s\n%s\n", WORD_PREFIX, word, DESCRIPTION_PREFIX, description, WORD_SEPARATOR));
         }
+
         // 如果这个单词已经存在
         if (lineToDeleteNum != 0)
         {
@@ -60,7 +60,8 @@ public class Dictionary
             File tempFile = tempFilePath.toFile();
 
             // 把想要保存的内容放到临时文件中，删除的内容忽略
-            try (Scanner scanner = new Scanner(file, StandardCharsets.UTF_8); PrintWriter tempWritter = new PrintWriter(tempFile, StandardCharsets.UTF_8))
+            try (Scanner scanner = new Scanner(path, StandardCharsets.UTF_8);
+                 Writer tempWriter = new OutputStreamWriter(new FileOutputStream(tempFile), StandardCharsets.UTF_8))
             {
                 int nowLineNum = 0;//当前正在读取的行
                 String buffer;
@@ -80,7 +81,7 @@ public class Dictionary
                     else
                     {
                         buffer = scanner.nextLine() + "\n";
-                        tempWritter.append(buffer);
+                        tempWriter.append(buffer);
                     }
                 }
             }
@@ -93,10 +94,9 @@ public class Dictionary
     private int find(String word) throws IOException
     {
         String buffer;
-        File file = path.toFile();
         int lineNumber = 0;
         int lineNumberCopy = 0;
-        try (Scanner scanner = new Scanner(file, StandardCharsets.UTF_8))
+        try (Scanner scanner = new Scanner(path, StandardCharsets.UTF_8))
         {
             while (scanner.hasNextLine())
             {
@@ -117,12 +117,11 @@ public class Dictionary
 
     public void print(String word) throws IOException
     {
-        File file = path.toFile();
         int lineNumber = find(word);
         String buffer;
         if (lineNumber != 0)
         {
-            try (Scanner scanner = new Scanner(file))
+            try (Scanner scanner = new Scanner(path, StandardCharsets.UTF_8))
             {
                 for (int i = 0; i < lineNumber - 1; i++)
                 {
@@ -169,7 +168,7 @@ public class Dictionary
                 {
                     String word, description;
                     System.out.print("请输入单词: ");
-                    word = in.nextLine().toLowerCase();
+                    word = in.nextLine();
                     System.out.print("请输入解释: ");
                     description = in.nextLine();
                     dictionary.add(word, description);
@@ -180,7 +179,7 @@ public class Dictionary
                 {
                     String word;
                     System.out.print("请输入单词: ");
-                    word = in.nextLine().toLowerCase();
+                    word = in.nextLine();
                     dictionary.print(word);
                     System.out.println("查询完毕。按回车返回主菜单");
                     in.nextLine();

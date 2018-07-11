@@ -54,9 +54,13 @@ public class PrimeNumberCalculator
     {
         List<Integer> validPrimeNumberList = getValidPrimeNumbers();
         System.out.printf("符合条件的素数共有%d个\n", validPrimeNumberList.size());
-        for (int num : validPrimeNumberList)
+        for (int i = 0; i < validPrimeNumberList.size(); i++)
         {
-            System.out.printf("%d ", num);
+            if (i % 10 == 0)
+            {
+                System.out.println();
+            }
+            System.out.printf("%8d", validPrimeNumberList.get(i));
         }
     }
 
@@ -86,7 +90,7 @@ public class PrimeNumberCalculator
         {
             return true;
         }
-        // 继续两两分割递归
+        // 不是素数且第一位不是0，继续两两分割递归。只要有一种分割成立就立即返回
         else
         {
             for (int i = 1; i < numberPart.length(); i++)

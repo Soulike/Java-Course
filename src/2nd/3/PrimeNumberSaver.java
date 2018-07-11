@@ -1,6 +1,6 @@
 import java.io.*;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
+import java.nio.charset.*;
+import java.nio.file.*;
 import java.util.*;
 
 /*编写程序求出1万以内的所有素数，并将这些素数输出到一个文本文件中，每行文本只包含一个素数数据。
@@ -38,22 +38,22 @@ public class PrimeNumberSaver
         }
     }
 
-    public void savePrimeNumbers(String filePath, Charset charset) throws IOException
+    public void savePrimeNumbers(String outputFilePathStr, Charset charset) throws IOException
     {
-        final File file = new File(filePath);
-        if (!file.exists()) // 如果文件不存在，创建文件
+        final Path filePath = Paths.get(outputFilePathStr);
+        if (Files.notExists(filePath))
         {
-            File dir = new File(file.getParent());
-            dir.mkdirs();
-            file.createNewFile();
+            Files.createDirectories(filePath.getParent());
+            Files.createFile(filePath);
         }
-        try (PrintWriter writer = new PrintWriter(filePath, charset))
+        try (PrintWriter writer = new PrintWriter(filePath.toFile(), charset))
         {
             for (int num : primeNumberList)
             {
                 writer.println(num);
             }
         }
+        System.out.printf("共输出%d以下素数%d个", LIMIT, primeNumberList.size());
     }
 
     public static void main(String[] args)

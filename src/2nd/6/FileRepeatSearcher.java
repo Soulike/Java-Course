@@ -1,3 +1,4 @@
+import java.io.IOException;
 import java.nio.file.*;
 import java.util.*;
 
@@ -15,22 +16,22 @@ public class FileRepeatSearcher
         this.folderPath = Paths.get(folderPath);
         if (Files.notExists(this.folderPath))
         {
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException("指定的文件夹不存在");
         }
     }
 
-    private List<MyFile> getAllFiles()
+    private List<MyFile> getAllFiles() throws IOException
     {
-        FileVisitor visitor = new FileVisitor(folderPath.toString());
+        final FileVisitor visitor = new FileVisitor(folderPath);
         return visitor.getAllFiles();
     }
 
-    public List<MyFile> getRepeatedFiles()
+    public List<MyFile> getRepeatedFiles() throws IOException
     {
         // 准备两份文件列表，一份用于删除，一份用于检查
-        List<MyFile> fileList = getAllFiles();
-        List<MyFile> fileListCopy = new LinkedList<>(fileList);
-        List<MyFile> repeatedFileList = new ArrayList<>();
+        final List<MyFile> fileList = getAllFiles();
+        final List<MyFile> fileListCopy = new LinkedList<>(fileList);
+        final List<MyFile> repeatedFileList = new ArrayList<>();
 
         for (MyFile file : fileList)
         {
@@ -54,8 +55,8 @@ public class FileRepeatSearcher
             }
             else
             {
-                FileRepeatSearcher searcher = new FileRepeatSearcher(args[0]);
-                List<MyFile> repeatedFileList = searcher.getRepeatedFiles();
+                final FileRepeatSearcher searcher = new FileRepeatSearcher(args[0]);
+                final List<MyFile> repeatedFileList = searcher.getRepeatedFiles();
                 if (repeatedFileList.size() == 0)
                 {
                     System.out.println("没有重复文件");
@@ -72,6 +73,10 @@ public class FileRepeatSearcher
         catch (IllegalArgumentException e)
         {
             System.out.println("参数无效。请指定有效且存在文件夹");
+        }
+        catch (IOException e)
+        {
+            System.out.println("IO 出错");
         }
     }
 }

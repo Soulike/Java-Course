@@ -1,6 +1,5 @@
 import java.io.*;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
+import java.nio.charset.*;
 import java.util.Scanner;
 
 /*给定文本文件，文件名称为a.txt，文件内容为一个8行8列的字符矩阵，内容为1和0字符，
@@ -41,7 +40,7 @@ public class MatrixCalculator
         System.out.println();
     }
 
-    private void printMatrix(int[][] matrix)
+    public static void printMatrix(int[][] matrix)
     {
         for (int[] row : matrix)
         {
@@ -164,7 +163,7 @@ public class MatrixCalculator
         return num;
     }
 
-    private int max(int... arr)
+    private static int max(int... arr)
     {
         int max = arr[0];
         for (int i : arr)
