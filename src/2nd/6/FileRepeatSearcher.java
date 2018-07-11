@@ -72,11 +72,11 @@ public class FileRepeatSearcher
         }
         catch (IllegalArgumentException e)
         {
-            System.out.println("参数无效。请指定有效且存在文件夹");
+            System.err.println("参数无效。请指定有效且存在文件夹");
         }
         catch (IOException e)
         {
-            System.out.println("IO 出错");
+            System.err.println("IO 出错");
         }
     }
 }

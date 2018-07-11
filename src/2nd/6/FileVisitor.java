@@ -37,7 +37,7 @@ public class FileVisitor
                 }
                 catch (IOException e)
                 {
-                    System.out.println("获取文件列表失败");
+                    System.err.println("获取文件列表失败");
                     fileList.clear();
                 }
             }
