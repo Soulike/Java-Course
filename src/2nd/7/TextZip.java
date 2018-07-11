@@ -7,15 +7,15 @@ import java.util.*;
  * ID就是指学号, 下面的作者一定要写上你的名字和学号
  * 作业中出现的示范数据abdc001需要改成学生的学号数据
  *
- * @author YOUR NAME and ID
- * @version THE DATE
+ * @author ZhouJingyao and 201692020
+ * @version 2018-07-11
  **/
 
 public class TextZip
 {
 
     //ID, 该学号的值需要修改!
-    private static final String ID = "abdc001";
+    private static final String ID = "201692020";
 
     /*频率文件每一条记录的开头、结尾与分隔符。主要是为了防止跨平台换行符问题
      * 文件格式：
@@ -421,8 +421,8 @@ public class TextZip
             // Write your own implementation here.
             File input = new File("a.txz");
             File output = new File("a.txt");
-            System.out.printf("Input file size: %d bytes\n", input.length());
-            System.out.printf("Output file size: %d bytes\n", output.length());
+            System.out.printf("Compressed file size: %d bytes\n", input.length());
+            System.out.printf("Original file size: %d bytes\n", output.length());
             System.out.printf("Compression ratio: %.2f%%\n", output.length() == 0 ? 0 : ((double) input.length()) / output.length() * 100);
         }
 
@@ -472,9 +472,9 @@ public class TextZip
 
             // then output the compression ratio
             // Write your own implementation here.
-            System.out.printf("Input file size: %d bytes\n", input.length());
-            System.out.printf("Output file size: %d bytes\n", output.length());
-            System.out.printf("Compression ratio: %.2f%%\n", output.length() == 0 ? 0 : ((double) input.length()) / output.length() * 100);
+            System.out.printf("Original file size: %d bytes\n", input.length());
+            System.out.printf("Compressed file size: %d bytes\n", output.length());
+            System.out.printf("Compression ratio: %.2f%%\n", input.length() == 0 ? 0 : ((double) output.length()) / input.length() * 100);
 
         }
 
@@ -494,8 +494,8 @@ public class TextZip
             // Write your own implementation here.
             File input = new File(args[1]);
             File output = new File(args[3]);
-            System.out.printf("Input file size: %d bytes\n", input.length());
-            System.out.printf("Output file size: %d bytes\n", output.length());
+            System.out.printf("Compressed file size: %d bytes\n", input.length());
+            System.out.printf("Original file size: %d bytes\n", output.length());
             System.out.printf("Compression ratio: %.2f%%\n", output.length() == 0 ? 0 : ((double) input.length()) / output.length() * 100);
         }
     }
