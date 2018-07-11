@@ -423,7 +423,7 @@ public class TextZip
             File output = new File("a.txt");
             System.out.printf("Input file size: %d bytes\n", input.length());
             System.out.printf("Output file size: %d bytes\n", output.length());
-            System.out.printf("Compression ratio: %.2f%%\n", ((double) input.length()) / output.length() * 100);
+            System.out.printf("Compression ratio: %.2f%%\n", output.length() == 0 ? 0 : ((double) input.length()) / output.length() * 100);
         }
 
         else if (args[0].equals("-f"))
@@ -474,7 +474,7 @@ public class TextZip
             // Write your own implementation here.
             System.out.printf("Input file size: %d bytes\n", input.length());
             System.out.printf("Output file size: %d bytes\n", output.length());
-            System.out.printf("Compression ratio: %.2f%%\n", ((double) output.length()) / input.length() * 100);
+            System.out.printf("Compression ratio: %.2f%%\n", output.length() == 0 ? 0 : ((double) input.length()) / output.length() * 100);
 
         }
 
@@ -496,7 +496,7 @@ public class TextZip
             File output = new File(args[3]);
             System.out.printf("Input file size: %d bytes\n", input.length());
             System.out.printf("Output file size: %d bytes\n", output.length());
-            System.out.printf("Compression ratio: %.2f%%\n", ((double) input.length()) / output.length() * 100);
+            System.out.printf("Compression ratio: %.2f%%\n", output.length() == 0 ? 0 : ((double) input.length()) / output.length() * 100);
         }
     }
 }
