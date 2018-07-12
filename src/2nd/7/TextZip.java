@@ -342,7 +342,7 @@ public class TextZip
     {
 
         // IMPLEMENT THIS METHOD
-        Reader reader = new InputStreamReader(new FileInputStream(inputFreqFile), StandardCharsets.UTF_8);
+        Reader reader = new InputStreamReader(new FileInputStream(inputFreqFile));
         ArrayList<TreeNode> treeNodeArrayList = new ArrayList<>();
         int c;
         StringBuilder stringBuilder = new StringBuilder();
